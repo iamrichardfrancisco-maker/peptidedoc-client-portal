@@ -435,7 +435,6 @@
         });
 
         function loadState() {
-            // Load tools from localStorage or use initial set
             const savedTools = localStorage.getItem('apex_portal_tools');
             if (savedTools) {
                 try {
@@ -448,7 +447,6 @@
                 saveToolsToStorage();
             }
 
-            // Load notes
             const savedNotes = localStorage.getItem('apex_portal_notes');
             if (savedNotes !== null) {
                 document.getElementById('quickNotes').value = savedNotes;
@@ -456,7 +454,6 @@
                 document.getElementById('quickNotes').value = "• Brand Primary Hex: #3B82F6\n• Weekly Status Calls: Tuesdays at 10 AM EST\n• Shared Drive Access: Access granted for marketing team.";
             }
 
-            // Load activities
             const savedLogs = localStorage.getItem('apex_portal_activity');
             if (savedLogs) {
                 try {
@@ -509,7 +506,6 @@
             const pinnedSection = document.getElementById('pinnedSection');
             const emptyState = document.getElementById('emptyState');
 
-            // Filter logic
             const filtered = tools.filter(tool => {
                 const matchesCategory = activeCategory === 'All Tools' || tool.category === activeCategory;
                 const matchesSearch = searchQuery === '' || 
@@ -522,12 +518,10 @@
             const pinnedTools = filtered.filter(t => t.pinned);
             const unpinnedTools = filtered.filter(t => !t.pinned);
 
-            // Render stats
             document.getElementById('statTotalTools').innerText = tools.length;
             document.getElementById('statPinnedTools').innerText = tools.filter(t => t.pinned).length;
             document.getElementById('statActiveTools').innerText = tools.filter(t => t.status === 'Active').length;
 
-            // Render Pinned Grid
             if (pinnedTools.length > 0) {
                 pinnedSection.classList.remove('hidden');
                 pinnedGrid.innerHTML = pinnedTools.map(tool => createCardHTML(tool)).join('');
@@ -536,14 +530,12 @@
                 pinnedGrid.innerHTML = '';
             }
 
-            // Render Regular Grid
             if (unpinnedTools.length > 0) {
                 toolsGrid.innerHTML = unpinnedTools.map(tool => createCardHTML(tool)).join('');
             } else {
                 toolsGrid.innerHTML = '';
             }
 
-            // Handle empty state
             if (filtered.length === 0) {
                 emptyState.classList.remove('hidden');
             } else {
@@ -563,136 +555,121 @@
                 'Pending Approval': 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20'
             };
 
-            // Render custom emoji or FontAwesome icon
             const isEmoji = /\p{Extended_Pictographic}/u.test(tool.icon);
             let iconHTML = '';
             if (isEmoji) {
                 iconHTML = `<span class="text-2xl">${tool.icon}</span>`;
             } else {
-                const iconClass = tool.icon.startsWith('fa-') ? tool.icon : 'fa-link';
+                const iconClass = tool.icon && tool.icon.startsWith('fa-') ? tool.icon : 'fa-link';
                 iconHTML = `<i class="fa-solid ${iconClass} text-lg text-blue-600 dark:text-blue-400"></i>`;
             }
 
             return `
-            <div class="group relative bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800 rounded-2xl p-5 hover:shadow-xl hover:shadow-blue-500/5 hover:border-blue-500/30 transition-all duration-200 flex flex-col justify-between">
-                
+            <div class="group relative bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800 rounded-2xl p-5 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-200 flex flex-col justify-between">
                 <div>
-                    <!-- Card Top Header -->
                     <div class="flex items-start justify-between gap-3 mb-3">
-                        <div class="w-11 h-11 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700/60 flex items-center justify-center shrink-0">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-gray-800 flex items-center justify-center shrink-0 border border-blue-100 dark:border-gray-700/60">
                             ${iconHTML}
                         </div>
-                        
-                        <div class="flex items-center space-x-1">
-                            <button onclick="togglePin('${tool.id}')" title="${tool.pinned ? 'Unpin' : 'Pin to favorites'}" 
-                                class="p-1.5 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors">
-                                <i class="fa-${tool.pinned ? 'solid text-amber-500' : 'regular'} fa-bookmark text-sm"></i>
-                            </button>
-
-                            <div class="relative group/menu">
-                                <button class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-                                    <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
-                                </button>
-                                <div class="absolute right-0 top-full mt-1 hidden group-hover/menu:block w-32 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-20 text-xs">
-                                    <button onclick="openLinkModal('${tool.id}')" class="w-full text-left px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2">
-                                        <i class="fa-solid fa-pen text-gray-400"></i> Edit
-                                    </button>
-                                    <button onclick="copyToClipboard('${tool.url}')" class="w-full text-left px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2">
-                                        <i class="fa-solid fa-copy text-gray-400"></i> Copy URL
-                                    </button>
-                                    <button onclick="deleteTool('${tool.id}')" class="w-full text-left px-3 py-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center gap-2 border-t border-gray-100 dark:border-gray-700/60">
-                                        <i class="fa-solid fa-trash"></i> Delete
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Title & Category -->
-                    <div class="space-y-1">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-[10px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
-                                ${tool.category}
-                            </span>
-                            <span class="text-[10px] font-medium px-2 py-0.5 rounded-md border ${statusColors[tool.status] || ''}">
+                        <div class="flex items-center space-x-1.5">
+                            <span class="text-[10px] font-medium px-2.5 py-1 rounded-full border ${statusColors[tool.status] || 'bg-gray-500/10 text-gray-500 border-gray-500/20'}">
                                 ${tool.status}
                             </span>
                         </div>
-                        <h4 class="font-bold text-gray-900 dark:text-white text-base group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+                    </div>
+
+                    <a href="${tool.url}" target="_blank" rel="noopener noreferrer" class="group/link block">
+                        <h4 class="font-bold text-gray-900 dark:text-white text-base group-hover/link:text-blue-600 dark:group-hover/link:text-blue-400 transition-colors flex items-center gap-1.5">
                             ${tool.name}
+                            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] opacity-0 group-hover/link:opacity-100 transition-opacity"></i>
                         </h4>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2 pt-0.5">
-                            ${tool.desc || 'No description provided.'}
-                        </p>
+                    </a>
+
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5 line-clamp-2 leading-relaxed">
+                        ${tool.desc || 'No description provided.'}
+                    </p>
+                </div>
+
+                <div class="pt-4 mt-4 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+                    <span class="text-[11px] font-medium text-gray-400 bg-gray-100 dark:bg-gray-800 px-2.5 py-0.5 rounded-md">
+                        ${tool.category}
+                    </span>
+                    <div class="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onclick="togglePin('${tool.id}')" class="p-1.5 text-gray-400 hover:text-amber-500 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="${tool.pinned ? 'Unpin' : 'Pin to top'}">
+                            <i class="fa-solid fa-thumbtack ${tool.pinned ? 'text-amber-500' : ''}"></i>
+                        </button>
+                        <button onclick="openEditModal('${tool.id}')" class="p-1.5 text-gray-400 hover:text-blue-500 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="Edit">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="deleteTool('${tool.id}')" class="p-1.5 text-gray-400 hover:text-red-500 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
                     </div>
                 </div>
-
-                <!-- Launch Button Footer -->
-                <div class="pt-4 mt-4 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
-                    <span class="text-[11px] text-gray-400 flex items-center gap-1">
-                        <i class="fa-solid fa-shield-halved text-[10px]"></i> Secure
-                    </span>
-                    <a href="${tool.url}" target="_blank" rel="noopener noreferrer" 
-                        class="inline-flex items-center text-xs font-semibold px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white transition-all gap-1.5">
-                        <span>Open Tool</span>
-                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                    </a>
-                </div>
-
-            </div>
-            `;
+            </div>`;
         }
 
-        function openLinkModal(editId = null) {
-            const modal = document.getElementById('linkModal');
-            const form = document.getElementById('linkForm');
-            const modalTitle = document.getElementById('modalTitle');
-
-            if (editId) {
-                const tool = tools.find(t => t.id === editId);
-                if (!tool) return;
-                modalTitle.innerText = "Edit Tool / Resource";
-                document.getElementById('editLinkId').value = tool.id;
-                document.getElementById('toolName').value = tool.name;
-                document.getElementById('toolUrl').value = tool.url;
-                document.getElementById('toolCategory').value = tool.category;
-                document.getElementById('toolStatus').value = tool.status;
-                document.getElementById('toolIcon').value = tool.icon;
-                document.getElementById('toolDesc').value = tool.desc;
-                document.getElementById('toolPinned').checked = tool.pinned;
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value.trim();
+            const clearBtn = document.getElementById('clearSearchBtn');
+            if (searchQuery.length > 0) {
+                clearBtn.classList.remove('hidden');
             } else {
-                modalTitle.innerText = "Add New Tool or Link";
-                form.reset();
-                document.getElementById('editLinkId').value = '';
+                clearBtn.classList.add('hidden');
             }
+            renderApp();
+        }
 
-            modal.classList.remove('hidden');
+        function handleMobileSearch() {
+            searchQuery = document.getElementById('mobileSearchInput').value.trim();
+            renderApp();
+        }
+
+        function clearSearch() {
+            searchQuery = '';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('mobileSearchInput').value = '';
+            document.getElementById('clearSearchBtn').classList.add('hidden');
+            renderApp();
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('apex_theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('apex_theme', 'dark');
+            }
+        }
+
+        function openLinkModal() {
+            document.getElementById('modalTitle').innerText = 'Add New Tool or Link';
+            document.getElementById('editLinkId').value = '';
+            document.getElementById('linkForm').reset();
+            document.getElementById('linkModal').classList.remove('hidden');
         }
 
         function closeLinkModal() {
             document.getElementById('linkModal').classList.add('hidden');
         }
 
-        function handleSaveLink(event) {
-            event.preventDefault();
-            const editId = document.getElementById('editLinkId').value;
-            const name = document.getElementById('toolName').value.trim();
-            const url = document.getElementById('toolUrl').value.trim();
+        function handleSaveLink(e) {
+            e.preventDefault();
+            const id = document.getElementById('editLinkId').value;
+            const name = document.getElementById('toolName').value;
+            const url = document.getElementById('toolUrl').value;
             const category = document.getElementById('toolCategory').value;
             const status = document.getElementById('toolStatus').value;
-            let icon = document.getElementById('toolIcon').value.trim() || 'fa-link';
-            const desc = document.getElementById('toolDesc').value.trim();
+            const icon = document.getElementById('toolIcon').value || 'fa-link';
+            const desc = document.getElementById('toolDesc').value;
             const pinned = document.getElementById('toolPinned').checked;
 
-            if (editId) {
+            if (id) {
                 // Edit existing
-                tools = tools.map(t => {
-                    if (t.id === editId) {
-                        return { ...t, name, url, category, status, icon, desc, pinned };
-                    }
-                    return t;
-                });
-                showToast(`Updated "${name}"`);
+                tools = tools.map(t => t.id === id ? { ...t, name, url, category, status, icon, desc, pinned } : t);
+                showToast('Tool updated successfully');
                 addActivityLog(`Updated tool: ${name}`);
             } else {
                 // Add new
@@ -708,7 +685,7 @@
                     createdAt: new Date().toISOString()
                 };
                 tools.unshift(newTool);
-                showToast(`Added "${name}" successfully`);
+                showToast('New tool added successfully');
                 addActivityLog(`Added new tool: ${name}`);
             }
 
@@ -717,23 +694,40 @@
             renderApp();
         }
 
-        function deleteTool(id) {
+        function openEditModal(id) {
             const tool = tools.find(t => t.id === id);
             if (!tool) return;
 
-            tools = tools.filter(t => t.id !== id);
-            saveToolsToStorage();
-            showToast(`Deleted "${tool.name}"`, 'trash');
-            addActivityLog(`Removed tool: ${tool.name}`);
-            renderApp();
+            document.getElementById('modalTitle').innerText = 'Edit Tool / Link';
+            document.getElementById('editLinkId').value = tool.id;
+            document.getElementById('toolName').value = tool.name;
+            document.getElementById('toolUrl').value = tool.url;
+            document.getElementById('toolCategory').value = tool.category;
+            document.getElementById('toolStatus').value = tool.status;
+            document.getElementById('toolIcon').value = tool.icon;
+            document.getElementById('toolDesc').value = tool.desc;
+            document.getElementById('toolPinned').checked = tool.pinned;
+
+            document.getElementById('linkModal').classList.remove('hidden');
+        }
+
+        function deleteTool(id) {
+            const tool = tools.find(t => t.id === id);
+            if (confirm(`Are you sure you want to delete "${tool ? tool.name : 'this tool'}"?`)) {
+                tools = tools.filter(t => t.id !== id);
+                saveToolsToStorage();
+                renderApp();
+                showToast('Tool removed');
+                if (tool) addActivityLog(`Removed tool: ${tool.name}`);
+            }
         }
 
         function togglePin(id) {
             tools = tools.map(t => {
                 if (t.id === id) {
-                    const newPinned = !t.pinned;
-                    showToast(newPinned ? `Pinned "${t.name}"` : `Unpinned "${t.name}"`);
-                    return { ...t, pinned: newPinned };
+                    const updatedPinned = !t.pinned;
+                    addActivityLog(`${updatedPinned ? 'Pinned' : 'Unpinned'} tool: ${t.name}`);
+                    return { ...t, pinned: updatedPinned };
                 }
                 return t;
             });
@@ -741,78 +735,40 @@
             renderApp();
         }
 
-        function handleSearch() {
-            searchQuery = document.getElementById('searchInput').value;
-            toggleClearSearchBtn();
-            renderApp();
-        }
-
-        function handleMobileSearch() {
-            searchQuery = document.getElementById('mobileSearchInput').value;
-            renderApp();
-        }
-
-        function toggleClearSearchBtn() {
-            const btn = document.getElementById('clearSearchBtn');
-            if (searchQuery.length > 0) {
-                btn.classList.remove('hidden');
-            } else {
-                btn.classList.add('hidden');
-            }
-        }
-
-        function clearSearch() {
-            searchQuery = '';
-            document.getElementById('searchInput').value = '';
-            document.getElementById('mobileSearchInput').value = '';
-            toggleClearSearchBtn();
-            renderApp();
-        }
-
-        // Notes functions
         function saveNotes() {
-            const notesText = document.getElementById('quickNotes').value;
-            localStorage.setItem('apex_portal_notes', notesText);
-            document.getElementById('noteSaveStatus').innerText = "Saved!";
-            showToast("Notes saved locally");
+            const notes = document.getElementById('quickNotes').value;
+            localStorage.setItem('apex_portal_notes', notes);
+            const btn = document.getElementById('saveNoteBtn');
+            btn.innerText = 'Saved!';
+            document.getElementById('noteSaveStatus').innerText = 'Saved locally';
             setTimeout(() => {
-                document.getElementById('noteSaveStatus').innerText = "Auto-saves locally";
+                btn.innerText = 'Save';
             }, 2000);
+            addActivityLog('Client reference notes updated');
+            showToast('Notes saved successfully');
         }
 
         function markNotesDirty() {
-            document.getElementById('noteSaveStatus').innerText = "Unsaved changes...";
+            document.getElementById('noteSaveStatus').innerText = 'Unsaved changes...';
         }
 
         function copyNotesToClipboard() {
-            const text = document.getElementById('quickNotes').value;
-            copyToClipboard(text, "Notes copied to clipboard!");
-        }
-
-        function copyToClipboard(text, message = "URL copied to clipboard!") {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                showToast(message);
-            } catch (err) {
-                showToast("Failed to copy", "circle-xmark");
-            }
-            document.body.removeChild(textarea);
+            const notes = document.getElementById('quickNotes').value;
+            navigator.clipboard.writeText(notes).then(() => {
+                showToast('Notes copied to clipboard');
+            });
         }
 
         function renderActivityLogs() {
             const container = document.getElementById('activityLogList');
             if (activityLogs.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 italic text-[11px]">No recent updates recorded.</p>`;
+                container.innerHTML = '<p class="text-gray-400 italic">No recent updates recorded.</p>';
                 return;
             }
 
             container.innerHTML = activityLogs.map(log => `
-                <div class="flex items-start justify-between gap-2 border-b border-gray-100 dark:border-gray-800/60 pb-2">
-                    <span class="text-gray-700 dark:text-gray-300">${log.msg}</span>
+                <div class="flex items-start justify-between gap-2 border-b border-gray-100 dark:border-gray-800 pb-2 last:border-0">
+                    <span class="text-gray-700 dark:text-gray-300 leading-relaxed">${log.msg}</span>
                     <span class="text-[10px] text-gray-400 shrink-0">${log.time}</span>
                 </div>
             `).join('');
@@ -822,39 +778,18 @@
             activityLogs = [];
             localStorage.removeItem('apex_portal_activity');
             renderActivityLogs();
-            showToast("Activity history cleared");
+            showToast('Activity log cleared');
         }
 
-        function toggleTheme() {
-            const html = document.documentElement;
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.setItem('apex_portal_theme', 'light');
-            } else {
-                html.classList.add('dark');
-                localStorage.setItem('apex_portal_theme', 'dark');
-            }
-        }
-
-        // Toast notifications
-        function showToast(msg, icon = 'circle-check') {
+        function showToast(msg) {
             const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toastMsg');
-            const toastIcon = document.getElementById('toastIcon');
-
-            toastMsg.innerText = msg;
-            toastIcon.className = `fa-solid fa-${icon} text-emerald-400`;
-
+            document.getElementById('toastMsg').innerText = msg;
             toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
             setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
                 toast.classList.add('translate-y-20', 'opacity-0');
-            }, 2500);
+            }, 3000);
         }
 
-        // Global keybindings
         function setupKeyboardShortcuts() {
             window.addEventListener('keydown', (e) => {
                 if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
@@ -865,6 +800,12 @@
                     closeLinkModal();
                 }
             });
+
+            // Load saved theme state
+            const savedTheme = localStorage.getItem('apex_theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+            }
         }
     </script>
 </body>
