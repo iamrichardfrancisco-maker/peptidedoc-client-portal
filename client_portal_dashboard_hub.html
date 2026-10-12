@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Portal & Dashboard Hub</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .dark .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.4);
+            border-radius: 9999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.7);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100 min-h-screen font-sans flex flex-col transition-colors duration-200">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-30 border-b border-gray-200 dark:border-gray-800 glass-panel">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16 gap-4">
+                
+                <!-- Branding -->
+                <div class="flex items-center space-x-3 shrink-0">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                        <i class="fa-solid fa-cubes text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg leading-none bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 bg-clip-text text-transparent">Apex Client Portal</h1>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Central Hub & Workspace</p>
+                    </div>
+                </div>
+
+                <!-- Global Search Field -->
+                <div class="flex-1 max-w-md hidden md:block">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                        <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search tools, links, tags, descriptions... (Press '/' to focus)" 
+                            class="w-full pl-10 pr-10 py-2 text-sm bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 transition-all text-gray-800 dark:text-gray-200 placeholder-gray-400">
+                        <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                            <i class="fa-solid fa-xmark text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action Controls & Dark Mode Toggle -->
+                <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
+                    <button onclick="openLinkModal()" class="inline-flex items-center px-3.5 py-2 rounded-xl text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-md shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-95">
+                        <i class="fa-solid fa-plus mr-2 text-xs"></i> Add Tool
+                    </button>
+                    
+                    <button onclick="toggleTheme()" id="themeToggleBtn" class="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" title="Toggle Light/Dark Theme">
+                        <i class="fa-solid fa-moon text-base dark:hidden"></i>
+                        <i class="fa-solid fa-sun text-base hidden dark:block text-amber-400"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Search Bar -->
+            <div class="pb-3 md:hidden">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <input type="text" id="mobileSearchInput" oninput="handleMobileSearch()" placeholder="Search tools or tags..." 
+                        class="w-full pl-10 pr-4 py-2 text-sm bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
+        
+        <!-- Welcome & Quick Stats Bar -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-blue-900/10 via-indigo-900/10 to-purple-900/10 dark:from-blue-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 p-6 rounded-2xl border border-blue-500/10 dark:border-blue-500/20">
+            <div>
+                <h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Welcome back, Client Portal</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Access all your marketing, analytics, cloud platforms, and project links in one place.</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="bg-white dark:bg-gray-800/80 px-4 py-2.5 rounded-xl border border-gray-200/80 dark:border-gray-700/60 shadow-sm text-center">
+                    <span class="block text-xs text-gray-500 dark:text-gray-400 font-medium">Total Tools</span>
+                    <span id="statTotalTools" class="text-lg font-bold text-gray-900 dark:text-white">0</span>
+                </div>
+                <div class="bg-white dark:bg-gray-800/80 px-4 py-2.5 rounded-xl border border-gray-200/80 dark:border-gray-700/60 shadow-sm text-center">
+                    <span class="block text-xs text-gray-500 dark:text-gray-400 font-medium">Pinned</span>
+                    <span id="statPinnedTools" class="text-lg font-bold text-blue-600 dark:text-blue-400">0</span>
+                </div>
+                <div class="bg-white dark:bg-gray-800/80 px-4 py-2.5 rounded-xl border border-gray-200/80 dark:border-gray-700/60 shadow-sm text-center">
+                    <span class="block text-xs text-gray-500 dark:text-gray-400 font-medium">Active Status</span>
+                    <span id="statActiveTools" class="text-lg font-bold text-emerald-600 dark:text-emerald-400">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Categories Bar -->
+        <div class="flex items-center space-x-2 overflow-x-auto pb-2 custom-scrollbar" id="categoryFilterContainer">
+            <!-- Category pills dynamically injected here -->
+        </div>
+
+        <!-- MAIN GRID & SIDEBAR SECTION -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+            
+            <!-- Cards Section (3 Cols on Desktop) -->
+            <div class="lg:col-span-3 space-y-8">
+                
+                <!-- Pinned / Favorites Section -->
+                <div id="pinnedSection" class="space-y-4 hidden">
+                    <div class="flex items-center space-x-2 text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+                        <i class="fa-solid fa-thumbtack text-amber-500"></i>
+                        <span>Pinned Quick Links</span>
+                    </div>
+                    <div id="pinnedGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <!-- Pinned cards populated here -->
+                    </div>
+                </div>
+
+                <!-- Main Tools Section -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2 text-sm font-semibold text-gray-500 dark:text-gray-400 tracking-wider uppercase">
+                            <i class="fa-solid fa-grid-2 text-blue-500"></i>
+                            <span id="sectionTitle">All Resources & Tools</span>
+                        </div>
+                        <span id="searchResultCount" class="text-xs font-medium text-gray-400"></span>
+                    </div>
+
+                    <!-- Tools Grid -->
+                    <div id="toolsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                        <!-- Tool cards populated here -->
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="emptyState" class="hidden text-center py-16 px-4 bg-white dark:bg-gray-900 rounded-2xl border border-dashed border-gray-300 dark:border-gray-800">
+                        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-400">
+                            <i class="fa-solid fa-folder-open text-2xl"></i>
+                        </div>
+                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">No tools found</h3>
+                        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-sm mx-auto">Try adjusting your search query, selecting another category, or add a new link.</p>
+                        <button onclick="clearSearch()" class="mt-4 px-4 py-2 text-xs font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors">
+                            Clear Filters
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Dashboard Sidebar (1 Col on Desktop) -->
+            <div class="space-y-6">
+                
+                <!-- Quick Notes / Instructions Widget -->
+                <div class="bg-white dark:bg-gray-900 rounded-2xl p-5 border border-gray-200/80 dark:border-gray-800 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-note-sticky text-amber-500 text-base"></i>
+                            <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Client Reference Notes</h3>
+                        </div>
+                        <button onclick="saveNotes()" id="saveNoteBtn" class="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium">Save</button>
+                    </div>
+                    <textarea id="quickNotes" oninput="markNotesDirty()" placeholder="Type important login reminders, brand color hex codes, drive links, or project notes here..." 
+                        class="w-full h-36 p-3 text-xs bg-gray-50 dark:bg-gray-800/60 border border-gray-200 dark:border-gray-700/60 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/50 resize-none custom-scrollbar text-gray-800 dark:text-gray-200 placeholder-gray-400"></textarea>
+                    <div class="flex justify-between items-center text-[11px] text-gray-400">
+                        <span id="noteSaveStatus">Auto-saves locally</span>
+                        <button onclick="copyNotesToClipboard()" class="hover:text-gray-600 dark:hover:text-gray-200 flex items-center gap-1">
+                            <i class="fa-solid fa-copy"></i> Copy
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Recent Activity / Audit Log -->
+                <div class="bg-white dark:bg-gray-900 rounded-2xl p-5 border border-gray-200/80 dark:border-gray-800 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-clock-rotate-left text-indigo-500 text-base"></i>
+                            <h3 class="font-semibold text-gray-900 dark:text-white text-sm">Recent Updates</h3>
+                        </div>
+                        <button onclick="clearActivityLog()" class="text-[11px] text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">Clear</button>
+                    </div>
+                    
+                    <div id="activityLogList" class="space-y-3 max-h-64 overflow-y-auto custom-scrollbar text-xs">
+                        <!-- Activity entries rendered here -->
+                    </div>
+                </div>
+
+                <!-- Portal Support & Shared Folder Box -->
+                <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-5 text-white shadow-md space-y-3">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-headset text-lg"></i>
+                        <h4 class="font-bold text-sm">Need Help or Access?</h4>
+                    </div>
+                    <p class="text-xs text-indigo-100 leading-relaxed">Contact your designated account executive or project manager for login credentials or added integrations.</p>
+                    <div class="pt-1">
+                        <a href="mailto:support@agency.com" class="inline-flex items-center text-xs font-semibold px-3 py-1.5 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-lg transition-colors">
+                            <i class="fa-solid fa-envelope mr-1.5"></i> Contact Manager
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Add / Edit Link Modal -->
+    <div id="linkModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-sm transition-opacity">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full border border-gray-200 dark:border-gray-800 shadow-2xl overflow-hidden transform transition-all">
+            <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                <h3 id="modalTitle" class="font-bold text-gray-900 dark:text-white text-base">Add New Tool or Link</h3>
+                <button onclick="closeLinkModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <form id="linkForm" onsubmit="handleSaveLink(event)" class="p-6 space-y-4">
+                <input type="hidden" id="editLinkId">
+                
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Tool / Service Name *</label>
+                    <input type="text" id="toolName" required placeholder="e.g. Google Analytics Dashboard" 
+                        class="w-full px-3.5 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 dark:text-white">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Direct URL *</label>
+                    <input type="url" id="toolUrl" required placeholder="https://analytics.google.com" 
+                        class="w-full px-3.5 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 dark:text-white">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Category *</label>
+                        <select id="toolCategory" required class="w-full px-3.5 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 dark:text-white">
+                            <option value="Marketing">Marketing</option>
+                            <option value="Analytics">Analytics</option>
+                            <option value="Client Assets">Client Assets</option>
+                            <option value="Administrative">Administrative</option>
+                            <option value="Design">Design</option>
+                            <option value="Quick Links">Quick Links</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
+                        <select id="toolStatus" class="w-full px-3.5 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 dark:text-white">
+                            <option value="Active">Active</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Pending Approval">Pending Approval</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Icon (FontAwesome class or Emoji)</label>
+                    <input type="text" id="toolIcon" placeholder="fa-chart-line OR 📊" 
+                        class="w-full px-3.5 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 dark:text-white">
+                    <p class="text-[11px] text-gray-400 mt-1">Default FontAwesome icon class (e.g. fa-link) or any emoji.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Short Description</label>
+                    <textarea id="toolDesc" rows="2" placeholder="Brief description of what this tool is used for..." 
+                        class="w-full px-3.5 py-2 text-sm bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-gray-900 dark:text-white resize-none"></textarea>
+                </div>
+
+                <div class="flex items-center space-x-2 pt-1">
+                    <input type="checkbox" id="toolPinned" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700">
+                    <label for="toolPinned" class="text-xs font-medium text-gray-700 dark:text-gray-300">Pin to Favorites at Top</label>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-100 dark:border-gray-800">
+                    <button type="button" onclick="closeLinkModal()" class="px-4 py-2 text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-xs font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-md shadow-blue-500/20 transition-all">Save Tool</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification Overlay -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none flex items-center space-x-2 bg-gray-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-gray-700 text-sm">
+        <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toastMsg">Action completed</span>
+    </div>
+
+    <script>
+        // Default pre-populated seed data
+        const initialTools = [
+            {
+                id: '1',
+                name: 'Google Analytics 4',
+                url: 'https://analytics.google.com',
+                category: 'Analytics',
+                status: 'Active',
+                icon: 'fa-chart-column',
+                desc: 'Real-time traffic metrics, user engagement, and marketing conversions.',
+                pinned: true,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: '2',
+                name: 'Figma Brand Kit & Assets',
+                url: 'https://figma.com',
+                category: 'Design',
+                status: 'Active',
+                icon: 'fa-figma',
+                desc: 'Shared brand guidelines, logo files, high-res vectors, and UI kits.',
+                pinned: true,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: '3',
+                name: 'Meta Ads Manager',
+                url: 'https://adsmanager.facebook.com',
+                category: 'Marketing',
+                status: 'Active',
+                icon: 'fa-rectangle-ad',
+                desc: 'Facebook & Instagram ad campaign performace and budget trackers.',
+                pinned: false,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: '4',
+                name: 'Client Google Drive',
+                url: 'https://drive.google.com',
+                category: 'Client Assets',
+                status: 'Active',
+                icon: 'fa-folder-shared',
+                desc: 'Centralized repository for raw video footage, documents, and deliverables.',
+                pinned: true,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: '5',
+                name: 'Stripe Billing Portal',
+                url: 'https://stripe.com',
+                category: 'Administrative',
+                status: 'Active',
+                icon: 'fa-credit-card',
+                desc: 'View invoices, billing history, payment methods, and retainers.',
+                pinned: false,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: '6',
+                name: 'Buffer Social Scheduler',
+                url: 'https://buffer.com',
+                category: 'Marketing',
+                status: 'Maintenance',
+                icon: 'fa-share-nodes',
+                desc: 'Social content calendar and automated post queues across networks.',
+                pinned: false,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: '7',
+                name: 'Webflow CMS Portal',
+                url: 'https://webflow.com',
+                category: 'Quick Links',
+                status: 'Active',
+                icon: 'fa-globe',
+                desc: 'Live website editor for blog posts, product updates, and content.',
+                pinned: false,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: '8',
+                name: 'HubSpot CRM',
+                url: 'https://hubspot.com',
+                category: 'Administrative',
+                status: 'Pending Approval',
+                icon: 'fa-users',
+                desc: 'Sales pipeline integration and contact management database.',
+                pinned: false,
+                createdAt: new Date().toISOString()
+            }
+        ];
+
+        // Categories list
+        const categories = ['All Tools', 'Marketing', 'Analytics', 'Client Assets', 'Administrative', 'Design', 'Quick Links'];
+
+        // State variables
+        let tools = [];
+        let activeCategory = 'All Tools';
+        let searchQuery = '';
+        let activityLogs = [];
+
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            loadState();
+            renderCategoryTabs();
+            renderApp();
+            setupKeyboardShortcuts();
+        });
+
+        function loadState() {
+            // Load tools from localStorage or use initial set
+            const savedTools = localStorage.getItem('apex_portal_tools');
+            if (savedTools) {
+                try {
+                    tools = JSON.parse(savedTools);
+                } catch(e) {
+                    tools = initialTools;
+                }
+            } else {
+                tools = initialTools;
+                saveToolsToStorage();
+            }
+
+            // Load notes
+            const savedNotes = localStorage.getItem('apex_portal_notes');
+            if (savedNotes !== null) {
+                document.getElementById('quickNotes').value = savedNotes;
+            } else {
+                document.getElementById('quickNotes').value = "• Brand Primary Hex: #3B82F6\n• Weekly Status Calls: Tuesdays at 10 AM EST\n• Shared Drive Access: Access granted for marketing team.";
+            }
+
+            // Load activities
+            const savedLogs = localStorage.getItem('apex_portal_activity');
+            if (savedLogs) {
+                try {
+                    activityLogs = JSON.parse(savedLogs);
+                } catch(e) {
+                    activityLogs = [];
+                }
+            } else {
+                activityLogs = [
+                    { msg: 'Portal initialized with standard links', time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
+                ];
+            }
+        }
+
+        function saveToolsToStorage() {
+            localStorage.setItem('apex_portal_tools', JSON.stringify(tools));
+        }
+
+        function addActivityLog(msg) {
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            activityLogs.unshift({ msg, time });
+            if (activityLogs.length > 15) activityLogs.pop();
+            localStorage.setItem('apex_portal_activity', JSON.stringify(activityLogs));
+            renderActivityLogs();
+        }
+
+        function renderCategoryTabs() {
+            const container = document.getElementById('categoryFilterContainer');
+            container.innerHTML = categories.map(cat => {
+                const isActive = activeCategory === cat;
+                const activeClasses = isActive 
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20 font-semibold' 
+                    : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/60 border border-gray-200/80 dark:border-gray-700/60';
+                
+                return `<button onclick="setCategory('${cat}')" class="px-4 py-2 rounded-xl text-xs whitespace-nowrap transition-all ${activeClasses}">
+                    ${cat}
+                </button>`;
+            }).join('');
+        }
+
+        function setCategory(cat) {
+            activeCategory = cat;
+            renderCategoryTabs();
+            renderApp();
+        }
+
+        function renderApp() {
+            const pinnedGrid = document.getElementById('pinnedGrid');
+            const toolsGrid = document.getElementById('toolsGrid');
+            const pinnedSection = document.getElementById('pinnedSection');
+            const emptyState = document.getElementById('emptyState');
+
+            // Filter logic
+            const filtered = tools.filter(tool => {
+                const matchesCategory = activeCategory === 'All Tools' || tool.category === activeCategory;
+                const matchesSearch = searchQuery === '' || 
+                    tool.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                    tool.desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    tool.category.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCategory && matchesSearch;
+            });
+
+            const pinnedTools = filtered.filter(t => t.pinned);
+            const unpinnedTools = filtered.filter(t => !t.pinned);
+
+            // Render stats
+            document.getElementById('statTotalTools').innerText = tools.length;
+            document.getElementById('statPinnedTools').innerText = tools.filter(t => t.pinned).length;
+            document.getElementById('statActiveTools').innerText = tools.filter(t => t.status === 'Active').length;
+
+            // Render Pinned Grid
+            if (pinnedTools.length > 0) {
+                pinnedSection.classList.remove('hidden');
+                pinnedGrid.innerHTML = pinnedTools.map(tool => createCardHTML(tool)).join('');
+            } else {
+                pinnedSection.classList.add('hidden');
+                pinnedGrid.innerHTML = '';
+            }
+
+            // Render Regular Grid
+            if (unpinnedTools.length > 0) {
+                toolsGrid.innerHTML = unpinnedTools.map(tool => createCardHTML(tool)).join('');
+            } else {
+                toolsGrid.innerHTML = '';
+            }
+
+            // Handle empty state
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            document.getElementById('sectionTitle').innerText = activeCategory === 'All Tools' ? 'All Resources & Tools' : `${activeCategory} Tools`;
+            document.getElementById('searchResultCount').innerText = `${filtered.length} tool${filtered.length === 1 ? '' : 's'}`;
+
+            renderActivityLogs();
+        }
+
+        function createCardHTML(tool) {
+            const statusColors = {
+                'Active': 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+                'Maintenance': 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+                'Pending Approval': 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20'
+            };
+
+            // Render custom emoji or FontAwesome icon
+            const isEmoji = /\p{Extended_Pictographic}/u.test(tool.icon);
+            let iconHTML = '';
+            if (isEmoji) {
+                iconHTML = `<span class="text-2xl">${tool.icon}</span>`;
+            } else {
+                const iconClass = tool.icon.startsWith('fa-') ? tool.icon : 'fa-link';
+                iconHTML = `<i class="fa-solid ${iconClass} text-lg text-blue-600 dark:text-blue-400"></i>`;
+            }
+
+            return `
+            <div class="group relative bg-white dark:bg-gray-900 border border-gray-200/80 dark:border-gray-800 rounded-2xl p-5 hover:shadow-xl hover:shadow-blue-500/5 hover:border-blue-500/30 transition-all duration-200 flex flex-col justify-between">
+                
+                <div>
+                    <!-- Card Top Header -->
+                    <div class="flex items-start justify-between gap-3 mb-3">
+                        <div class="w-11 h-11 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700/60 flex items-center justify-center shrink-0">
+                            ${iconHTML}
+                        </div>
+                        
+                        <div class="flex items-center space-x-1">
+                            <button onclick="togglePin('${tool.id}')" title="${tool.pinned ? 'Unpin' : 'Pin to favorites'}" 
+                                class="p-1.5 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors">
+                                <i class="fa-${tool.pinned ? 'solid text-amber-500' : 'regular'} fa-bookmark text-sm"></i>
+                            </button>
+
+                            <div class="relative group/menu">
+                                <button class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                                    <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
+                                </button>
+                                <div class="absolute right-0 top-full mt-1 hidden group-hover/menu:block w-32 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-20 text-xs">
+                                    <button onclick="openLinkModal('${tool.id}')" class="w-full text-left px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2">
+                                        <i class="fa-solid fa-pen text-gray-400"></i> Edit
+                                    </button>
+                                    <button onclick="copyToClipboard('${tool.url}')" class="w-full text-left px-3 py-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 flex items-center gap-2">
+                                        <i class="fa-solid fa-copy text-gray-400"></i> Copy URL
+                                    </button>
+                                    <button onclick="deleteTool('${tool.id}')" class="w-full text-left px-3 py-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center gap-2 border-t border-gray-100 dark:border-gray-700/60">
+                                        <i class="fa-solid fa-trash"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Title & Category -->
+                    <div class="space-y-1">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-[10px] font-semibold tracking-wide uppercase px-2 py-0.5 rounded-md bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400">
+                                ${tool.category}
+                            </span>
+                            <span class="text-[10px] font-medium px-2 py-0.5 rounded-md border ${statusColors[tool.status] || ''}">
+                                ${tool.status}
+                            </span>
+                        </div>
+                        <h4 class="font-bold text-gray-900 dark:text-white text-base group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-1">
+                            ${tool.name}
+                        </h4>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed line-clamp-2 pt-0.5">
+                            ${tool.desc || 'No description provided.'}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Launch Button Footer -->
+                <div class="pt-4 mt-4 border-t border-gray-100 dark:border-gray-800/80 flex items-center justify-between">
+                    <span class="text-[11px] text-gray-400 flex items-center gap-1">
+                        <i class="fa-solid fa-shield-halved text-[10px]"></i> Secure
+                    </span>
+                    <a href="${tool.url}" target="_blank" rel="noopener noreferrer" 
+                        class="inline-flex items-center text-xs font-semibold px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white transition-all gap-1.5">
+                        <span>Open Tool</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                </div>
+
+            </div>
+            `;
+        }
+
+        function openLinkModal(editId = null) {
+            const modal = document.getElementById('linkModal');
+            const form = document.getElementById('linkForm');
+            const modalTitle = document.getElementById('modalTitle');
+
+            if (editId) {
+                const tool = tools.find(t => t.id === editId);
+                if (!tool) return;
+                modalTitle.innerText = "Edit Tool / Resource";
+                document.getElementById('editLinkId').value = tool.id;
+                document.getElementById('toolName').value = tool.name;
+                document.getElementById('toolUrl').value = tool.url;
+                document.getElementById('toolCategory').value = tool.category;
+                document.getElementById('toolStatus').value = tool.status;
+                document.getElementById('toolIcon').value = tool.icon;
+                document.getElementById('toolDesc').value = tool.desc;
+                document.getElementById('toolPinned').checked = tool.pinned;
+            } else {
+                modalTitle.innerText = "Add New Tool or Link";
+                form.reset();
+                document.getElementById('editLinkId').value = '';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeLinkModal() {
+            document.getElementById('linkModal').classList.add('hidden');
+        }
+
+        function handleSaveLink(event) {
+            event.preventDefault();
+            const editId = document.getElementById('editLinkId').value;
+            const name = document.getElementById('toolName').value.trim();
+            const url = document.getElementById('toolUrl').value.trim();
+            const category = document.getElementById('toolCategory').value;
+            const status = document.getElementById('toolStatus').value;
+            let icon = document.getElementById('toolIcon').value.trim() || 'fa-link';
+            const desc = document.getElementById('toolDesc').value.trim();
+            const pinned = document.getElementById('toolPinned').checked;
+
+            if (editId) {
+                // Edit existing
+                tools = tools.map(t => {
+                    if (t.id === editId) {
+                        return { ...t, name, url, category, status, icon, desc, pinned };
+                    }
+                    return t;
+                });
+                showToast(`Updated "${name}"`);
+                addActivityLog(`Updated tool: ${name}`);
+            } else {
+                // Add new
+                const newTool = {
+                    id: Date.now().toString(),
+                    name,
+                    url,
+                    category,
+                    status,
+                    icon,
+                    desc,
+                    pinned,
+                    createdAt: new Date().toISOString()
+                };
+                tools.unshift(newTool);
+                showToast(`Added "${name}" successfully`);
+                addActivityLog(`Added new tool: ${name}`);
+            }
+
+            saveToolsToStorage();
+            closeLinkModal();
+            renderApp();
+        }
+
+        function deleteTool(id) {
+            const tool = tools.find(t => t.id === id);
+            if (!tool) return;
+
+            tools = tools.filter(t => t.id !== id);
+            saveToolsToStorage();
+            showToast(`Deleted "${tool.name}"`, 'trash');
+            addActivityLog(`Removed tool: ${tool.name}`);
+            renderApp();
+        }
+
+        function togglePin(id) {
+            tools = tools.map(t => {
+                if (t.id === id) {
+                    const newPinned = !t.pinned;
+                    showToast(newPinned ? `Pinned "${t.name}"` : `Unpinned "${t.name}"`);
+                    return { ...t, pinned: newPinned };
+                }
+                return t;
+            });
+            saveToolsToStorage();
+            renderApp();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('searchInput').value;
+            toggleClearSearchBtn();
+            renderApp();
+        }
+
+        function handleMobileSearch() {
+            searchQuery = document.getElementById('mobileSearchInput').value;
+            renderApp();
+        }
+
+        function toggleClearSearchBtn() {
+            const btn = document.getElementById('clearSearchBtn');
+            if (searchQuery.length > 0) {
+                btn.classList.remove('hidden');
+            } else {
+                btn.classList.add('hidden');
+            }
+        }
+
+        function clearSearch() {
+            searchQuery = '';
+            document.getElementById('searchInput').value = '';
+            document.getElementById('mobileSearchInput').value = '';
+            toggleClearSearchBtn();
+            renderApp();
+        }
+
+        // Notes functions
+        function saveNotes() {
+            const notesText = document.getElementById('quickNotes').value;
+            localStorage.setItem('apex_portal_notes', notesText);
+            document.getElementById('noteSaveStatus').innerText = "Saved!";
+            showToast("Notes saved locally");
+            setTimeout(() => {
+                document.getElementById('noteSaveStatus').innerText = "Auto-saves locally";
+            }, 2000);
+        }
+
+        function markNotesDirty() {
+            document.getElementById('noteSaveStatus').innerText = "Unsaved changes...";
+        }
+
+        function copyNotesToClipboard() {
+            const text = document.getElementById('quickNotes').value;
+            copyToClipboard(text, "Notes copied to clipboard!");
+        }
+
+        function copyToClipboard(text, message = "URL copied to clipboard!") {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast(message);
+            } catch (err) {
+                showToast("Failed to copy", "circle-xmark");
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function renderActivityLogs() {
+            const container = document.getElementById('activityLogList');
+            if (activityLogs.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 italic text-[11px]">No recent updates recorded.</p>`;
+                return;
+            }
+
+            container.innerHTML = activityLogs.map(log => `
+                <div class="flex items-start justify-between gap-2 border-b border-gray-100 dark:border-gray-800/60 pb-2">
+                    <span class="text-gray-700 dark:text-gray-300">${log.msg}</span>
+                    <span class="text-[10px] text-gray-400 shrink-0">${log.time}</span>
+                </div>
+            `).join('');
+        }
+
+        function clearActivityLog() {
+            activityLogs = [];
+            localStorage.removeItem('apex_portal_activity');
+            renderActivityLogs();
+            showToast("Activity history cleared");
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('apex_portal_theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('apex_portal_theme', 'dark');
+            }
+        }
+
+        // Toast notifications
+        function showToast(msg, icon = 'circle-check') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.innerText = msg;
+            toastIcon.className = `fa-solid fa-${icon} text-emerald-400`;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+
+        // Global keybindings
+        function setupKeyboardShortcuts() {
+            window.addEventListener('keydown', (e) => {
+                if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                    document.getElementById('searchInput').focus();
+                }
+                if (e.key === 'Escape') {
+                    closeLinkModal();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
