@@ -326,96 +326,41 @@
 
     <script>
         // Default pre-populated seed data
-        const initialTools = [
-            {
-                id: '1',
-                name: 'Google Analytics 4',
-                url: 'https://analytics.google.com',
-                category: 'Analytics',
-                status: 'Active',
-                icon: 'fa-chart-column',
-                desc: 'Real-time traffic metrics, user engagement, and marketing conversions.',
-                pinned: true,
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '2',
-                name: 'Figma Brand Kit & Assets',
-                url: 'https://figma.com',
-                category: 'Design',
-                status: 'Active',
-                icon: 'fa-figma',
-                desc: 'Shared brand guidelines, logo files, high-res vectors, and UI kits.',
-                pinned: true,
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '3',
-                name: 'Meta Ads Manager',
-                url: 'https://adsmanager.facebook.com',
-                category: 'Marketing',
-                status: 'Active',
-                icon: 'fa-rectangle-ad',
-                desc: 'Facebook & Instagram ad campaign performace and budget trackers.',
-                pinned: false,
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '4',
-                name: 'Client Google Drive',
-                url: 'https://drive.google.com',
-                category: 'Client Assets',
-                status: 'Active',
-                icon: 'fa-folder-shared',
-                desc: 'Centralized repository for raw video footage, documents, and deliverables.',
-                pinned: true,
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '5',
-                name: 'Stripe Billing Portal',
-                url: 'https://stripe.com',
-                category: 'Administrative',
-                status: 'Active',
-                icon: 'fa-credit-card',
-                desc: 'View invoices, billing history, payment methods, and retainers.',
-                pinned: false,
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '6',
-                name: 'Buffer Social Scheduler',
-                url: 'https://buffer.com',
-                category: 'Marketing',
-                status: 'Maintenance',
-                icon: 'fa-share-nodes',
-                desc: 'Social content calendar and automated post queues across networks.',
-                pinned: false,
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '7',
-                name: 'Webflow CMS Portal',
-                url: 'https://webflow.com',
-                category: 'Quick Links',
-                status: 'Active',
-                icon: 'fa-globe',
-                desc: 'Live website editor for blog posts, product updates, and content.',
-                pinned: false,
-                createdAt: new Date().toISOString()
-            },
-            {
-                id: '8',
-                name: 'HubSpot CRM',
-                url: 'https://hubspot.com',
-                category: 'Administrative',
-                status: 'Pending Approval',
-                icon: 'fa-users',
-                desc: 'Sales pipeline integration and contact management database.',
-                pinned: false,
-                createdAt: new Date().toISOString()
-            }
-        ];
+     const initialTools = [
+    {
+        id: '1',
+        name: 'WordPress Website',
+        url: 'https://yourwebsite.com/wp-admin',
+        category: 'Administrative',
+        status: 'Active',
+        icon: 'fa-brands fa-wordpress',
+        desc: 'WordPress backend login and site management.',
+        pinned: true,
+        createdAt: new Date().toISOString()
+    },
+    {
+        id: '2',
+        name: 'Private Email',
+        url: 'https://mail.yourdomain.com',
+        category: 'Administrative',
+        status: 'Active',
+        icon: 'fa-envelope',
+        desc: 'Webmail portal for client email access.',
+        pinned: true,
+        createdAt: new Date().toISOString()
+    },
+    {
+        id: '3',
+        name: 'Order Management',
+        url: 'https://yourdomain.com/orders',
+        category: 'Administrative',
+        status: 'Active',
+        icon: 'fa-box',
+        desc: 'Order management portal and order tracking.',
+        pinned: false,
+        createdAt: new Date().toISOString()
+    }
+];
 
         // Categories list
         const categories = ['All Tools', 'Marketing', 'Analytics', 'Client Assets', 'Administrative', 'Design', 'Quick Links'];
